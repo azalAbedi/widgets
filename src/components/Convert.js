@@ -5,6 +5,17 @@ dotenv.config();
 
 function Convert({ language, text }) {
   const [translated, setTranslated] = useState("");
+  const [debouncedText, setDebouncedText] = useState(text);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedText(text);
+    }, 500);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [text]);
 
   useEffect(() => {
     const doTranslation = async () => {
@@ -13,7 +24,7 @@ function Convert({ language, text }) {
         {},
         {
           params: {
-            q: text,
+            q: debouncedText,
             target: language.value,
             key: `${process.env.REACT_APP_GOOGLE_TRANSLATE_API_KEY}`,
           },
@@ -24,7 +35,7 @@ function Convert({ language, text }) {
     };
 
     doTranslation();
-  }, [language, text]);
+  }, [language, debouncedText]);
 
   return (
     <div>
